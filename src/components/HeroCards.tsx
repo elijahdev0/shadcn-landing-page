@@ -62,6 +62,31 @@ export const HeroCards = () => {
   const [appInteractionStep, setAppInteractionStep] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const outerContainerRef = useRef<HTMLDivElement>(null); // Ref for the main outer div
+  const phoneMockupRef = useRef<HTMLDivElement>(null); // Ref for the phone motion.div
+
+  useEffect(() => {
+    const logDimensions = () => {
+      if (outerContainerRef.current) {
+        console.log('[HeroCards Dimensions] Outer Container:', {
+          width: outerContainerRef.current.offsetWidth,
+          height: outerContainerRef.current.offsetHeight,
+        });
+      }
+      if (phoneMockupRef.current) {
+        console.log('[HeroCards Dimensions] Phone Mockup:', {
+          width: phoneMockupRef.current.offsetWidth,
+          height: phoneMockupRef.current.offsetHeight,
+        });
+      }
+    };
+
+    logDimensions(); // Log on mount and subsequent updates
+
+    // Optional: Log on resize if you want to debug responsiveness dynamically
+    window.addEventListener('resize', logDimensions);
+    return () => window.removeEventListener('resize', logDimensions);
+  }, [appInteractionStep]); // Re-log if interaction step changes, as layout might be affected
 
   const openNotificationAndApp = () => {
     setShowLockScreenNotification(false);
@@ -159,9 +184,10 @@ export const HeroCards = () => {
   ];
 
   return (
-    <div className="hidden lg:flex justify-center items-center relative w-[700px] h-[500px] select-none">
+    <div ref={outerContainerRef} className="flex justify-center items-center relative w-full lg:w-[700px] lg:h-[500px] select-none py-10 lg:py-0">
       <motion.div
-        className="relative w-72 h-[30rem] bg-gray-800 dark:bg-gray-900 rounded-[2.5rem] border-[10px] border-gray-700 dark:border-gray-800 shadow-2xl overflow-hidden"
+        ref={phoneMockupRef}
+        className="relative w-full max-w-[320px] h-[70vh] max-h-[560px] lg:w-72 lg:h-[30rem] bg-gray-800 dark:bg-gray-900 rounded-[2.5rem] border-[8px] lg:border-[10px] border-gray-700 dark:border-gray-800 shadow-2xl overflow-hidden"
         variants={phoneVariants}
         initial="initial"
         animate="animate"
