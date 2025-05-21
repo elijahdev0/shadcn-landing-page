@@ -6,6 +6,7 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 // import { SignupPage } from './pages/SignupPage'; // Removed SignupPage import
 import { DashboardPage } from './pages/DashboardPage';
+import { NotFoundPage } from './pages/NotFoundPage'; // Import NotFoundPage
 import { ProtectedRoute } from './components/ProtectedRoute';
 import "./App.css"; // Main app styles
 
@@ -39,7 +40,9 @@ function App() {
            <Route index element={<DashboardPage />} /> {/* if DashboardPage is the only child */}
           {/* <Route path="" element={<DashboardPage />} /> Alternative if more nested dashboard routes */}
         </Route>
-        {/* Add other routes as needed */}
+        
+        {/* Catch-all 404 Route */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

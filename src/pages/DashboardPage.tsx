@@ -1,20 +1,16 @@
 import {
-  Activity,
-  ArrowUpRight,
   CircleUser,
-  CreditCard,
-  DollarSign,
   Menu,
   Package2,
   Search,
-  Users,
 } from "lucide-react"
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+// Avatar components removed as they are no longer used in the simplified dashboard
+// import {
+//   Avatar,
+//   AvatarFallback,
+//   AvatarImage,
+// } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -44,26 +40,13 @@ import {
 } from "@/components/ui/table"
 import { Link } from "react-router-dom" // Using Link from react-router-dom
 import { useAuth } from "../contexts/AuthContext" // To get user info and logout
-
-// Example data - replace with actual data or props
-const recentSales = [
-  { name: "Olivia Martin", email: "olivia.martin@email.com", amount: "+$1,999.00" },
-  { name: "Jackson Lee", email: "jackson.lee@email.com", amount: "+$39.00" },
-  { name: "Isabella Nguyen", email: "isabella.nguyen@email.com", amount: "+$299.00" },
-  { name: "William Kim", email: "will@email.com", amount: "+$99.00" },
-  { name: "Sofia Davis", email: "sofia.davis@email.com", amount: "+$39.00" },
-];
-
-const recentTransactions = [
-  { customer: "Liam Johnson", type: "Sale", status: "Success", date: "2023-06-23", amount: "$250.00", email: "liam@example.com" },
-  { customer: "Olivia Smith", type: "Refund", status: "Declined", date: "2023-06-24", amount: "$150.00", email: "olivia@example.com" },
-  { customer: "Noah Williams", type: "Subscription", status: "Success", date: "2023-06-25", amount: "$350.00", email: "noah@example.com" },
-  { customer: "Emma Brown", type: "Sale", status: "Success", date: "2023-06-26", amount: "$450.00", email: "emma@example.com" },
-  { customer: "Liam Johnson", type: "Sale", status: "Success", date: "2023-06-27", amount: "$550.00", email: "liam@example.com" },
-];
-
-
-export function DashboardPage() {
+// import { useNavigate } from 'react-router-dom'; // Already imported at the bottom, ensure only one import
+ 
+ // Unused example data removed
+ // const recentSales = [ ... ];
+ // const recentTransactions = [ ... ];
+ 
+ export function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate(); // from react-router-dom, if needed for programmatic navigation
 
@@ -81,38 +64,20 @@ export function DashboardPage() {
             to="#" // Changed from href
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
-            <Package2 className="h-6 w-6" />
-            <span className="sr-only">Acme Inc</span>
+            <Package2 className="h-6 w-6" /> {/* TODO: Replace Package2 with your Logo Component/Image */}
+            <span className="sr-only">EventSaaS</span> {/* Updated Brand Name */}
           </Link>
           <Link
-            to="/dashboard" // Changed from href
+            to="/dashboard"
             className="text-foreground transition-colors hover:text-foreground"
           >
             Dashboard
           </Link>
           <Link
-            to="#" // Changed from href
+            to="/guest-lists" // Added Guest Lists
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Orders
-          </Link>
-          <Link
-            to="#" // Changed from href
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Products
-          </Link>
-          <Link
-            to="#" // Changed from href
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Customers
-          </Link>
-          <Link
-            to="#" // Changed from href
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Analytics
+            Guest Lists
           </Link>
         </nav>
         <Sheet>
@@ -129,38 +94,20 @@ export function DashboardPage() {
           <SheetContent side="left">
             <nav className="grid gap-6 text-lg font-medium">
               <Link
-                to="#" // Changed from href
+                to="#"
                 className="flex items-center gap-2 text-lg font-semibold"
               >
-                <Package2 className="h-6 w-6" />
-                <span className="sr-only">Acme Inc</span>
+                <Package2 className="h-6 w-6" /> {/* TODO: Replace Package2 with your Logo Component/Image */}
+                <span className="sr-only">EventSaaS</span> {/* Updated Brand Name */}
               </Link>
-              <Link to="/dashboard" className="hover:text-foreground"> {/* Changed from href */}
+              <Link to="/dashboard" className="hover:text-foreground">
                 Dashboard
               </Link>
               <Link
-                to="#" // Changed from href
+                to="/guest-lists" // Added Guest Lists
                 className="text-muted-foreground hover:text-foreground"
               >
-                Orders
-              </Link>
-              <Link
-                to="#" // Changed from href
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Products
-              </Link>
-              <Link
-                to="#" // Changed from href
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Customers
-              </Link>
-              <Link
-                to="#" // Changed from href
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Analytics
+                Guest Lists
               </Link>
             </nav>
           </SheetContent>
@@ -171,7 +118,7 @@ export function DashboardPage() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search products..."
+                placeholder="Search events..."
                 className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
               />
             </div>
@@ -195,144 +142,34 @@ export function DashboardPage() {
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Revenue
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
-              <p className="text-xs text-muted-foreground">
-                +20.1% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Subscriptions
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
-              <p className="text-xs text-muted-foreground">
-                +180.1% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Sales</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+12,234</div>
-              <p className="text-xs text-muted-foreground">
-                +19% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+573</div>
-              <p className="text-xs text-muted-foreground">
-                +201 since last hour
-              </p>
-            </CardContent>
-          </Card>
+        {/* Placeholder for "Create New Event" Button */}
+        <div className="mb-6">
+          <Button size="lg" onClick={() => navigate('/create-event')}> {/* Ensure navigate is defined and imported if used here, or handle navigation differently */}
+            Create New Event
+          </Button>
         </div>
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
-            <CardHeader className="flex flex-row items-center">
-              <div className="grid gap-2">
-                <CardTitle>Transactions</CardTitle>
-                <CardDescription>
-                  Recent transactions from your store.
-                </CardDescription>
-              </div>
-              <Button asChild size="sm" className="ml-auto gap-1">
-                <Link to="#"> {/* Changed from href */}
-                  View All
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead className="hidden xl:table-column">
-                      Type
-                    </TableHead>
-                    <TableHead className="hidden xl:table-column">
-                      Status
-                    </TableHead>
-                    <TableHead className="hidden xl:table-column">
-                      Date
-                    </TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((transaction, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <div className="font-medium">{transaction.customer}</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          {transaction.email}
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden xl:table-column">
-                        {transaction.type}
-                      </TableCell>
-                      <TableCell className="hidden xl:table-column">
-                        <Badge className="text-xs" variant={transaction.status === "Success" ? "outline" : "secondary"}>
-                          {transaction.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                        {transaction.date}
-                      </TableCell>
-                      <TableCell className="text-right">{transaction.amount}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Sales</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-8">
-              {recentSales.map((sale, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <Avatar className="hidden h-9 w-9 sm:flex">
-                    <AvatarImage src={`/avatars/${index + 1}.png`} alt="Avatar" />
-                    <AvatarFallback>{sale.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
-                  </Avatar>
-                  <div className="grid gap-1">
-                    <p className="text-sm font-medium leading-none">
-                      {sale.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {sale.email}
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">{sale.amount}</div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+
+        {/* Placeholder for User's Events List */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">My Events</h2>
+          {/*
+            This is where the list of events will be rendered.
+            You might use a grid of Cards or a Table component.
+            Example structure for an event item (to be repeated/mapped):
+            <Card onClick={() => navigate('/event/EVENT_ID')} className="cursor-pointer">
+              <CardHeader>
+                <CardTitle>Event Name</CardTitle>
+                <CardDescription>Event Date - Event Status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>RSVPs: X / Y</p>
+              </CardContent>
+            </Card>
+          */}
+          <div className="border-dashed border-2 border-gray-300 p-8 rounded-lg text-center">
+            <p className="text-muted-foreground">Your events will appear here.</p>
+            <p className="text-sm text-muted-foreground">Click "Create New Event" to get started.</p>
+          </div>
         </div>
       </main>
     </div>
