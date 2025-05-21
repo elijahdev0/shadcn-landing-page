@@ -4,7 +4,7 @@ import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
-import { SignupPage } from './pages/SignupPage';
+// import { SignupPage } from './pages/SignupPage'; // Removed SignupPage import
 import { DashboardPage } from './pages/DashboardPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import "./App.css"; // Main app styles
@@ -28,9 +28,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
         </Route>
 
-        {/* Routes without the main layout (e.g., login, signup, dashboard might have their own full-page layouts) */}
+        {/* Routes without the main layout (e.g., login, dashboard might have their own full-page layouts) */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        {/* <Route path="/signup" element={<SignupPage />} /> Removed SignupPage route */}
         
         {/* Protected Dashboard Route */}
         <Route path="/dashboard" element={<ProtectedRoute />}>

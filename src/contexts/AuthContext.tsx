@@ -9,9 +9,9 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>; // Password will be ignored for magic link
   logout: () => Promise<void>;
-  signup: (email: string, pass: string, name?: string) => Promise<{ success: boolean; error?: string }>;
+  // Removed signup function
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,18 +20,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  // Mock login function
-  const login = async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
-    console.log('Attempting login with:', email, pass); // For testing
+  // Mock login function - Magic Link Style (any email logs in)
+  const login = async (email: string, _pass?: string): Promise<{ success: boolean; error?: string }> => { // Password (_pass) is ignored
+    console.log('Attempting magic link login with:', email); // For testing
     return new Promise((resolve) => {
       setTimeout(() => {
-        if (email === 'user@example.com' && pass === 'password') {
-          const mockUser: User = { id: '1', email: 'user@example.com', name: 'Test User' };
+        if (email && email.includes('@')) { // Basic email validation
+          const mockUser: User = { id: Date.now().toString(), email: email, name: email.split('@')[0] }; // Create user from email
           setUser(mockUser);
           setIsAuthenticated(true);
           resolve({ success: true });
         } else {
-          resolve({ success: false, error: 'Invalid email or password' });
+          resolve({ success: false, error: 'Please enter a valid email address.' });
         }
       }, 1000);
     });
@@ -48,26 +48,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
-  // Mock signup function
-  const signup = async (email: string, pass: string, name?: string): Promise<{ success: boolean; error?: string }> => {
-    console.log('Attempting signup with:', email, pass, name); // For testing
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulate user already exists
-        if (email === 'exists@example.com') {
-          resolve({ success: false, error: 'User already exists with this email' });
-        } else {
-          const newUser: User = { id: Date.now().toString(), email, name };
-          setUser(newUser);
-          setIsAuthenticated(true);
-          resolve({ success: true });
-        }
-      }, 1000);
-    });
-  };
+  // Removed signup function
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, signup }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

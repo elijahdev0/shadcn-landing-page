@@ -65,7 +65,7 @@ export const Navbar = () => {
       ]
     : [
         { to: "/login", label: "Login" },
-        { to: "/signup", label: "Sign Up", isExternal: false }, // Assuming Sign Up is a primary action
+        // { to: "/signup", label: "Sign Up", isExternal: false }, // Removed Sign Up
       ];
   
   const allMobileRoutes = [...routeList, ...authRoutes, { href: "https://github.com/leoMirandaa/shadcn-landing-page.git", label: "Github", isExternal: true }];
@@ -184,12 +184,12 @@ export const Navbar = () => {
                 >
                   Login
                 </Link>
-                <Link
+                {/* <Link
                   to="/signup"
                   className={`text-[17px] ${buttonVariants({ variant: "default" })}`} // Default for primary action
                 >
                   Sign Up
-                </Link>
+                </Link> */} {/* Removed Sign Up button */}
               </>
             )}
             <a
