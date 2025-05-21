@@ -1,173 +1,372 @@
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Badge } from "./ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Check, Linkedin } from "lucide-react";
-import { LightBulbIcon } from "./Icons";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+  Smartphone,
+  MessageCircle,
+  // Users, // No longer needed directly here, FaWhatsapp will be used
+  CalendarDays,
+  MapPin,
+  CheckSquare,
+  Sparkles,
+  Lock,
+  ThumbsUp,
+  ThumbsDown,
+  HelpCircle,
+  Send, // For sent message indicator (optional)
+  Drumstick,
+  FishIcon, // Lucide's fish icon
+  Carrot,   // For vegetarian
+  PencilLine, // For message input simulation
+} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa"; // Import FaWhatsapp
+import { useState, useEffect, useRef } from "react";
+
+// Animation Variants
+const phoneVariants = {
+  initial: { scale: 0.9, opacity: 0 },
+  animate: { scale: 1, opacity: 1, transition: { duration: 0.5 } },
+};
+
+const lockScreenNotificationVariants = {
+  initial: { y: -100, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 120, delay: 1.0 } }, // Delayed for lock screen to appear first
+  exit: { y: -100, opacity: 0, transition: { duration: 0.3 } },
+};
+
+const appScreenVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { delay: 0.2, duration: 0.4 } }, // Slight delay for lock screen to exit
+  exit: { opacity: 0, transition: { duration: 0.2 } },
+};
+
+const messageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
+};
+
+const buttonGroupVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.3, delay: 0.4 } }, 
+  exit: { opacity: 0, transition: { duration: 0.2 }},
+};
+
+const formInputVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3, delay: 0.3 }},
+}
 
 export const HeroCards = () => {
+  const [showLockScreen, setShowLockScreen] = useState(true);
+  const [showLockScreenNotification, setShowLockScreenNotification] = useState(false);
+  const [showAppScreen, setShowAppScreen] = useState(false);
+  const [appInteractionStep, setAppInteractionStep] = useState("");
+  const [selectedMeal, setSelectedMeal] = useState("");
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const openNotificationAndApp = () => {
+    setShowLockScreenNotification(false);
+    setShowLockScreen(false);
+    setShowAppScreen(true);
+    setTimeout(() => setAppInteractionStep('initialInvite'), 500);
+  };
+
+  useEffect(() => {
+    const timerLockNotif = setTimeout(() => {
+        if (showLockScreen) {
+            setShowLockScreenNotification(true);
+        }
+    }, 1200);
+    
+    let timerOpenApp: NodeJS.Timeout | undefined = undefined;
+    if (showLockScreenNotification && appInteractionStep === "") {
+        timerOpenApp = setTimeout(openNotificationAndApp, 3000);
+    }
+
+    return () => {
+      clearTimeout(timerLockNotif);
+      if (timerOpenApp) clearTimeout(timerOpenApp);
+    };
+  }, [showLockScreen, showLockScreenNotification, appInteractionStep]);
+
+  const simulateRsvpYes = () => setAppInteractionStep('rsvpSent');
+  const simulateMealChoice = (mealText: string) => {
+    setSelectedMeal(mealText);
+    setAppInteractionStep('mealChoiceSent');
+  };
+  const simulateSendMessage = () => setAppInteractionStep('finalMessageSent');
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | undefined;
+
+    if (appInteractionStep === 'initialInvite') {
+      timeoutId = setTimeout(simulateRsvpYes, 2500);
+    } else if (appInteractionStep === 'rsvpSent') {
+      timeoutId = setTimeout(() => setAppInteractionStep('showingMealChoice'), 1500);
+    } else if (appInteractionStep === 'showingMealChoice') {
+      timeoutId = setTimeout(() => simulateMealChoice("Chicken"), 2500);
+    } else if (appInteractionStep === 'mealChoiceSent') {
+      timeoutId = setTimeout(() => setAppInteractionStep('showingLeaveMessagePrompt'), 1500);
+    } else if (appInteractionStep === 'showingLeaveMessagePrompt') {
+      timeoutId = setTimeout(simulateSendMessage, 3000);
+    } else if (appInteractionStep === 'finalMessageSent') {
+      timeoutId = setTimeout(() => setAppInteractionStep('thankYouNote'), 1200);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [appInteractionStep]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [appInteractionStep]);
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const mealChoices = [
+    { text: "Chicken", icon: <Drumstick size={16} className="mr-1.5" />, choiceKey: "Chicken" },
+    { text: "Seafood", icon: <FishIcon size={16} className="mr-1.5" />, choiceKey: "Seafood" },
+    { text: "Vegetarian", icon: <Carrot size={16} className="mr-1.5" />, choiceKey: "Vegetarian" },
+  ];
+
+  const initialQuickReplies = [
+    { text: "🎉 Yes, I'll be there!", icon: <ThumbsUp size={14} />, color: "bg-green-500" }, 
+    { text: "😔 Can't make it", icon: <ThumbsDown size={14} />, color: "bg-red-500" },
+    { text: "🤔 Maybe", icon: <HelpCircle size={14} />, color: "bg-yellow-500" },
+  ];
+
   return (
-    <div className="hidden lg:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
-      {/* Testimonial */}
-      <Card className="absolute w-[340px] -top-[15px] drop-shadow-xl shadow-black/10 dark:shadow-white/10">
-        <CardHeader className="flex flex-row items-center gap-4 pb-2">
-          <Avatar>
-            <AvatarImage
-              alt=""
-              src="https://github.com/shadcn.png"
-            />
-            <AvatarFallback>SH</AvatarFallback>
-          </Avatar>
-
-          <div className="flex flex-col">
-            <CardTitle className="text-lg">John Doe React</CardTitle>
-            <CardDescription>@john_doe</CardDescription>
-          </div>
-        </CardHeader>
-
-        <CardContent>This landing page is awesome!</CardContent>
-      </Card>
-
-      {/* Team */}
-      <Card className="absolute right-[20px] top-4 w-80 flex flex-col justify-center items-center drop-shadow-xl shadow-black/10 dark:shadow-white/10">
-        <CardHeader className="mt-8 flex justify-center items-center pb-2">
-          <img
-            src="https://i.pravatar.cc/150?img=58"
-            alt="user avatar"
-            className="absolute grayscale-[0%] -top-12 rounded-full w-24 h-24 aspect-square object-cover"
-          />
-          <CardTitle className="text-center">Leo Miranda</CardTitle>
-          <CardDescription className="font-normal text-primary">
-            Frontend Developer
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="text-center pb-2">
-          <p>
-            I really enjoy transforming ideas into functional software that
-            exceeds expectations
-          </p>
-        </CardContent>
-
-        <CardFooter>
-          <div>
-            <a
-              rel="noreferrer noopener"
-              href="https://github.com/leoMirandaa"
-              target="_blank"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-              })}
-            >
-              <span className="sr-only">Github icon</span>
-              <GitHubLogoIcon className="w-5 h-5" />
-            </a>
-            <a
-              rel="noreferrer noopener"
-              href="https://twitter.com/leo_mirand4"
-              target="_blank"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-              })}
-            >
-              <span className="sr-only">X icon</span>
-              <svg
-                role="img"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                className="fill-foreground w-5 h-5"
+    <div className="hidden lg:flex justify-center items-center relative w-[700px] h-[500px] select-none">
+      <motion.div
+        className="relative w-72 h-[30rem] bg-gray-800 dark:bg-gray-900 rounded-[2.5rem] border-[10px] border-gray-700 dark:border-gray-800 shadow-2xl overflow-hidden"
+        variants={phoneVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <div className="absolute inset-0 rounded-[1.8rem] flex flex-col bg-black">
+          <AnimatePresence>
+            {showLockScreen && (
+              <motion.div 
+                key="lockScreen"
+                className="absolute inset-0 bg-gradient-to-br from-indigo-700 to-purple-800 dark:from-indigo-900 dark:to-purple-950 rounded-[1.8rem] p-4 flex flex-col items-center justify-center text-white z-20"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
               >
-                <title>X</title>
-                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
-              </svg>
-            </a>
-
-            <a
-              rel="noreferrer noopener"
-              href="https://www.linkedin.com/in/leopoldo-miranda/"
-              target="_blank"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-              })}
-            >
-              <span className="sr-only">Linkedin icon</span>
-              <Linkedin size="20" />
-            </a>
-          </div>
-        </CardFooter>
-      </Card>
-
-      {/* Pricing */}
-      <Card className="absolute top-[150px] left-[50px] w-72  drop-shadow-xl shadow-black/10 dark:shadow-white/10">
-        <CardHeader>
-          <CardTitle className="flex item-center justify-between">
-            Free
-            <Badge
-              variant="secondary"
-              className="text-sm text-primary"
-            >
-              Most popular
-            </Badge>
-          </CardTitle>
-          <div>
-            <span className="text-3xl font-bold">$0</span>
-            <span className="text-muted-foreground"> /month</span>
-          </div>
-
-          <CardDescription>
-            Lorem ipsum dolor sit, amet ipsum consectetur adipisicing elit.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          <Button className="w-full">Start Free Trial</Button>
-        </CardContent>
-
-        <hr className="w-4/5 m-auto mb-4" />
-
-        <CardFooter className="flex">
-          <div className="space-y-4">
-            {["4 Team member", "4 GB Storage", "Upto 6 pages"].map(
-              (benefit: string) => (
-                <span
-                  key={benefit}
-                  className="flex"
-                >
-                  <Check className="text-green-500" />{" "}
-                  <h3 className="ml-2">{benefit}</h3>
-                </span>
-              )
+                <Lock size={20} className="mb-4 opacity-80" />
+                <div className="text-5xl font-semibold opacity-90">{getCurrentTime()}</div>
+                <div className="text-sm opacity-70 mt-1">Swipe up to unlock</div>
+              </motion.div>
             )}
-          </div>
-        </CardFooter>
-      </Card>
+          </AnimatePresence>
+          <AnimatePresence>
+            {showLockScreenNotification && (
+              <motion.div 
+                key="lockScreenNotification"
+                className="absolute top-20 left-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-3 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-30"
+                variants={lockScreenNotificationVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="p-1 bg-emerald-500 rounded-full flex items-center justify-center w-6 h-6">
+                    <FaWhatsapp size={16} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-800 dark:text-white">Sophia & Liam</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">You're invited to our wedding! 🎉</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      {/* Service */}
-      <Card className="absolute w-[350px] -right-[10px] bottom-[35px]  drop-shadow-xl shadow-black/10 dark:shadow-white/10">
-        <CardHeader className="space-y-1 flex md:flex-row justify-start items-start gap-4">
-          <div className="mt-1 bg-primary/20 p-1 rounded-2xl">
-            <LightBulbIcon />
-          </div>
-          <div>
-            <CardTitle>Light & dark mode</CardTitle>
-            <CardDescription className="text-md mt-2">
-              Lorem ipsum dolor sit amet consect adipisicing elit. Consectetur
-              natusm.
-            </CardDescription>
-          </div>
-        </CardHeader>
-      </Card>
+          {/* --- WhatsApp App Screen Layer --- */}
+          <AnimatePresence>
+            {showAppScreen && (
+              <motion.div
+                key="appScreen"
+                className="absolute inset-0 bg-slate-100 dark:bg-slate-950 rounded-[1.8rem] flex flex-col z-10"
+                variants={appScreenVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+              >
+                {/* Top Bar - Simplified WhatsApp look */}
+                <div className="bg-emerald-500 dark:bg-emerald-700 p-3 flex items-center justify-between rounded-t-[1.7rem] flex-shrink-0">
+                  <div className="flex items-center space-x-2">
+                    <FaWhatsapp size={20} className="text-white" />
+                    <span className="text-white font-semibold text-sm">WhatsApp</span>
+                  </div>
+                  <Smartphone size={18} className="text-white opacity-70" />
+                </div>
+
+                {/* Main Chat Area - Mimics WhatsApp background, centers content */}
+                <div className="flex-grow p-3 overflow-y-auto relative bg-[#E5DDD5] dark:bg-[#0a1014] flex flex-col space-y-2">
+                  <AnimatePresence>
+                    {/* Initial Invitation Message */}
+                    {(appInteractionStep === 'initialInvite' || appInteractionStep === 'rsvpSent' || appInteractionStep === 'showingMealChoice' || appInteractionStep === 'mealChoiceSent' || appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
+                      <motion.div
+                        key="invitationInApp"
+                        className="bg-white dark:bg-[#202c33] p-3 rounded-lg shadow-md space-y-3 w-full max-w-xs my-2 self-center"
+                        variants={messageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                      >
+                        <div className="text-center">
+                          <Sparkles className="mx-auto text-yellow-500 dark:text-yellow-400 mb-1" size={28} />
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">You're Invited!</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Join us to celebrate the wedding of</p>
+                          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 my-1">Sophia & Liam</p>
+                        </div>
+
+                        <div className="space-y-1.5 text-xs text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center"><CalendarDays size={14} className="mr-2 text-emerald-500 dark:text-emerald-400" /> Saturday, Oct 26th, 2024</div>
+                          <div className="flex items-center"><MapPin size={14} className="mr-2 text-emerald-500 dark:text-emerald-400" /> The Grand Ballroom</div>
+                        </div>
+                        
+                        {appInteractionStep === 'initialInvite' && (
+                          <motion.div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/30 space-y-1.5 flex flex-col items-stretch" variants={buttonGroupVariants} initial="initial" animate="animate" exit="exit">
+                            {initialQuickReplies.map(reply => (
+                              <div key={reply.text} className={`w-full text-white text-xs py-2 px-3 rounded-md flex items-center justify-center space-x-1.5 shadow-sm text-center ${reply.color}`}>
+                                {reply.icon}<span>{reply.text}</span>
+                              </div>
+                            ))}
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* User's "Yes" RSVP Message */}
+                  {(appInteractionStep === 'rsvpSent' || appInteractionStep === 'showingMealChoice' || appInteractionStep === 'mealChoiceSent' || appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
+                    <motion.div
+                      key="userRsvpYes"
+                      className="bg-[#dcf8c6] dark:bg-[#056162] p-2.5 rounded-lg shadow-sm text-sm text-gray-800 dark:text-gray-100 max-w-[70%] self-end flex items-center"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <span>🎉 Yes, I'll be there!</span>
+                      <CheckSquare size={14} className="ml-1.5 text-blue-500 opacity-70" />
+                    </motion.div>
+                  )}
+                  
+                  {/* Host's Meal Choice Question */}
+                  {(appInteractionStep === 'showingMealChoice' || appInteractionStep === 'mealChoiceSent' || appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
+                    <motion.div
+                      key="mealChoiceQuestion"
+                      className="bg-white dark:bg-[#202c33] p-3 rounded-lg shadow-md text-sm text-gray-800 dark:text-gray-100 max-w-[85%] self-start"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <p>Great! So glad you can make it. 😊</p>
+                      <p className="mt-1">To help us with catering, please let us know your meal preference:</p>
+                      {/* Meal Choice Buttons - Only show if meal choice not yet sent */}
+                      {appInteractionStep === 'showingMealChoice' && (
+                        <motion.div className="mt-2.5 space-y-1.5 flex flex-col items-stretch" variants={buttonGroupVariants} initial="initial" animate="animate" exit="exit">
+                          {mealChoices.map(meal => (
+                             <div key={meal.choiceKey} className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs py-2 px-3 rounded-md flex items-center justify-center space-x-1.5 shadow-sm text-center border border-gray-300 dark:border-gray-600">
+                                {meal.icon}<span>{meal.text}</span>
+                              </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* User's Meal Choice Message */}
+                  {(appInteractionStep === 'mealChoiceSent' || appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && selectedMeal && (
+                    <motion.div
+                      key="userMealChoice"
+                      className="bg-[#dcf8c6] dark:bg-[#056162] p-2.5 rounded-lg shadow-sm text-sm text-gray-800 dark:text-gray-100 max-w-[70%] self-end flex items-center"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <span>{selectedMeal} for me, thanks!</span>
+                      <CheckSquare size={14} className="ml-1.5 text-blue-500 opacity-70" />
+                    </motion.div>
+                  )}
+
+                  {/* Host's "Leave a Message" Prompt */}
+                  {(appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
+                    <motion.div
+                      key="leaveMessagePrompt"
+                      className="bg-white dark:bg-[#202c33] p-3 rounded-lg shadow-md text-sm text-gray-800 dark:text-gray-100 max-w-[85%] self-start"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <p>Got it! Thanks. 😊</p>
+                      <p className="mt-1">And finally, would you like to leave a message for us with your RSVP?</p>
+                      {/* Simulated Text Input and Send Button - Only show if message not yet sent */}
+                      {appInteractionStep === 'showingLeaveMessagePrompt' && (
+                        <motion.div
+                          className="mt-2.5 space-y-2"
+                          variants={formInputVariants}
+                          initial="initial"
+                          animate="animate"
+                        >
+                          <div className="w-full bg-gray-100 dark:bg-gray-700 p-2.5 rounded-md text-gray-500 dark:text-gray-400 text-xs flex items-center">
+                            <PencilLine size={14} className="mr-2 opacity-70"/>
+                            <span>Type your message here...</span>
+                          </div>
+                          <div className="w-full bg-emerald-500 text-white text-xs py-2 px-3 rounded-md flex items-center justify-center space-x-1.5 shadow-sm transition-colors">
+                            <Send size={14}/>
+                            <span>Send Message</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                  
+                  {/* User's Final Message (Simulated) */}
+                  {(appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
+                    <motion.div
+                      key="userFinalMessage"
+                      className="bg-[#dcf8c6] dark:bg-[#056162] p-2.5 rounded-lg shadow-sm text-sm text-gray-800 dark:text-gray-100 max-w-[70%] self-end flex items-center"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <span>Can't wait for the big day! 🥳</span>
+                      <CheckSquare size={14} className="ml-1.5 text-blue-500 opacity-70" />
+                    </motion.div>
+                  )}
+
+                  {/* Host's Thank You Note */}
+                  {appInteractionStep === 'thankYouNote' && (
+                    <motion.div
+                      key="hostThankYou"
+                      className="bg-white dark:bg-[#202c33] p-3 rounded-lg shadow-md text-sm text-gray-800 dark:text-gray-100 max-w-[85%] self-start"
+                      variants={messageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      <p>Thank you for RSVPing! We're so excited to celebrate with you. ❤️</p>
+                    </motion.div>
+                  )}
+
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </div>
   );
 };
