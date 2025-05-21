@@ -118,10 +118,28 @@ export const HeroCards = () => {
   }, [appInteractionStep]);
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [appInteractionStep]);
+    console.log(`[HeroCards] appInteractionStep changed to: ${appInteractionStep}`);
+    const scrollTimer = setTimeout(() => {
+      if (chatContainerRef.current) {
+        const chatDiv = chatContainerRef.current;
+        console.log('[HeroCards] Attempting to scroll. Current state:', {
+          scrollHeight: chatDiv.scrollHeight,
+          scrollTop: chatDiv.scrollTop,
+          clientHeight: chatDiv.clientHeight,
+          appInteractionStep: appInteractionStep
+        });
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+        console.log('[HeroCards] Scrolled. New scrollTop:', chatDiv.scrollTop, 'Target scrollHeight:', chatDiv.scrollHeight);
+      } else {
+        console.log('[HeroCards] chatContainerRef.current is null, cannot scroll. appInteractionStep:', appInteractionStep);
+      }
+    }, 350); // Delay to wait for message animation and DOM update
+
+    return () => {
+      console.log(`[HeroCards] Clearing scrollTimer for appInteractionStep: ${appInteractionStep}`);
+      clearTimeout(scrollTimer);
+    };
+  }, [appInteractionStep]); // Re-run when new messages are triggered
 
   const getCurrentTime = () => {
     const now = new Date();
@@ -207,7 +225,7 @@ export const HeroCards = () => {
                 </div>
 
                 {/* Main Chat Area - Mimics WhatsApp background, centers content */}
-                <div className="flex-grow p-3 overflow-y-auto relative bg-[#E5DDD5] dark:bg-[#0a1014] flex flex-col space-y-2">
+                <div ref={chatContainerRef} className="flex-grow p-3 overflow-y-auto relative bg-[#E5DDD5] dark:bg-[#0a1014] flex flex-col space-y-2">
                   <AnimatePresence>
                     {/* Initial Invitation Message */}
                     {(appInteractionStep === 'initialInvite' || appInteractionStep === 'rsvpSent' || appInteractionStep === 'showingMealChoice' || appInteractionStep === 'mealChoiceSent' || appInteractionStep === 'showingLeaveMessagePrompt' || appInteractionStep === 'finalMessageSent' || appInteractionStep === 'thankYouNote') && (
