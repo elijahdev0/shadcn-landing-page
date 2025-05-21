@@ -1,36 +1,47 @@
-import { About } from "./components/About";
-import { Cta } from "./components/Cta";
-import { FAQ } from "./components/FAQ";
-import { Features } from "./components/Features";
-import { Footer } from "./components/Footer";
-import { Hero } from "./components/Hero";
-import { HowItWorks } from "./components/HowItWorks";
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { Navbar } from "./components/Navbar";
-import { Newsletter } from "./components/Newsletter";
-import { Pricing } from "./components/Pricing";
-import { ScrollToTop } from "./components/ScrollToTop";
-import { Services } from "./components/Services";
-import { Sponsors } from "./components/Sponsors";
-import { Team } from "./components/Team";
-import { Testimonials } from "./components/Testimonials";
-import "./App.css";
+import { Footer } from './components/Footer';
+import { ScrollToTop } from './components/ScrollToTop';
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import "./App.css"; // Main app styles
+
+// Layout component to include Navbar, Footer, ScrollToTop
+const MainLayout = () => (
+  <>
+    <Navbar />
+    <Outlet /> {/* Child routes will render here */}
+    <Footer />
+    <ScrollToTop />
+  </>
+);
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <HowItWorks />
-      <Features />
-      <Testimonials />
-      <Pricing />
+    <Router>
+      <Routes>
+        {/* Routes with Navbar, Footer, ScrollToTop */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+        </Route>
 
-      <FAQ />
-      <Cta />
-
-      <Footer />
-      <ScrollToTop />
-    </>
+        {/* Routes without the main layout (e.g., login, signup, dashboard might have their own full-page layouts) */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        
+        {/* Protected Dashboard Route */}
+        <Route path="/dashboard" element={<ProtectedRoute />}>
+          {/* DashboardPage will be rendered by Outlet in ProtectedRoute if authenticated */}
+          {/* Or, if DashboardPage includes its own header/sidebar, it can be directly routed */}
+           <Route index element={<DashboardPage />} /> {/* if DashboardPage is the only child */}
+          {/* <Route path="" element={<DashboardPage />} /> Alternative if more nested dashboard routes */}
+        </Route>
+        {/* Add other routes as needed */}
+      </Routes>
+    </Router>
   );
 }
 

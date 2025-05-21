@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Added Link and useNavigate
+import { useAuth } from "../contexts/AuthContext"; // Added useAuth
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,14 +15,17 @@ import {
 } from "@/components/ui/sheet";
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button"; // Added Button
 import { Menu } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { LogoIcon } from "./Icons";
 
 interface RouteProps {
-  href: string;
+  href?: string; // Made href optional
   label: string;
+  to?: string; // Optional: for react-router Link
+  isExternal?: boolean;
+  onClick?: () => void;
 }
 
 const routeList: RouteProps[] = [
@@ -44,19 +49,40 @@ const routeList: RouteProps[] = [
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    setIsOpen(false); // Close mobile menu if open
+    navigate("/"); // Redirect to home after logout
+  };
+
+  const authRoutes: RouteProps[] = isAuthenticated
+    ? [
+        { to: "/dashboard", label: "Dashboard" },
+        { label: "Logout", onClick: handleLogout },
+      ]
+    : [
+        { to: "/login", label: "Login" },
+        { to: "/signup", label: "Sign Up", isExternal: false }, // Assuming Sign Up is a primary action
+      ];
+  
+  const allMobileRoutes = [...routeList, ...authRoutes, { href: "https://github.com/leoMirandaa/shadcn-landing-page.git", label: "Github", isExternal: true }];
+
+
   return (
     <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
       <NavigationMenu className="mx-auto">
         <NavigationMenuList className="container h-14 px-4 w-screen flex justify-between ">
           <NavigationMenuItem className="font-bold flex">
-            <a
-              rel="noreferrer noopener"
-              href="/"
-              className="ml-2 font-bold text-xl flex"
+            <Link // Changed to Link
+              to="/"
+              className="ml-2 font-bold text-xl flex items-center" // Added items-center
             >
               <LogoIcon />
-              ShadcnUI/React
-            </a>
+              <span className="ml-2">ShadcnUI/React</span> {/* Added span and ml-2 for spacing */}
+            </Link>
           </NavigationMenuItem>
 
           {/* mobile */}
@@ -83,38 +109,50 @@ export const Navbar = () => {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col justify-center items-center gap-2 mt-4">
-                  {routeList.map(({ href, label }: RouteProps) => (
-                    <a
-                      rel="noreferrer noopener"
-                      key={label}
-                      href={href}
-                      onClick={() => setIsOpen(false)}
-                      className={buttonVariants({ variant: "ghost" })}
-                    >
-                      {label}
-                    </a>
+                  {allMobileRoutes.map((route) => (
+                    route.to ? (
+                      <Link
+                        key={route.label}
+                        to={route.to}
+                        onClick={() => setIsOpen(false)}
+                        className={buttonVariants({ variant: "ghost" })}
+                      >
+                        {route.label}
+                      </Link>
+                    ) : route.onClick ? (
+                       <Button
+                        key={route.label}
+                        variant="ghost"
+                        onClick={() => { route.onClick?.(); setIsOpen(false);}}
+                        className="w-full"
+                      >
+                        {route.label}
+                      </Button>
+                    ) : (
+                      <a
+                        key={route.label}
+                        href={route.href}
+                        target={route.isExternal ? "_blank" : undefined}
+                        rel={route.isExternal ? "noreferrer noopener" : undefined}
+                        onClick={() => setIsOpen(false)}
+                        className={buttonVariants({ variant: "ghost" })}
+                      >
+                        {route.label === "Github" && <GitHubLogoIcon className="mr-2 w-5 h-5" />}
+                        {route.label}
+                      </a>
+                    )
                   ))}
-                  <a
-                    rel="noreferrer noopener"
-                    href="https://github.com/leoMirandaa/shadcn-landing-page.git"
-                    target="_blank"
-                    className={`w-[110px] border ${buttonVariants({
-                      variant: "secondary",
-                    })}`}
-                  >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
-                  </a>
                 </nav>
               </SheetContent>
             </Sheet>
           </span>
 
           {/* desktop */}
+          {/* Landing page section links */}
           <nav className="hidden md:flex gap-2">
             {routeList.map((route: RouteProps, i) => (
               <a
-                rel="noreferrer noopener"
+                rel="noreferrer noopener" // Keep for hash links
                 href={route.href}
                 key={i}
                 className={`text-[17px] ${buttonVariants({
@@ -126,7 +164,34 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          <div className="hidden md:flex gap-2">
+          {/* Auth links and other actions */}
+          <div className="hidden md:flex gap-2 items-center"> {/* Added items-center */}
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`text-[17px] ${buttonVariants({ variant: "ghost" })}`}
+                >
+                  Dashboard
+                </Link>
+                <Button variant="outline" onClick={handleLogout}>Logout</Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className={`text-[17px] ${buttonVariants({ variant: "ghost" })}`}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className={`text-[17px] ${buttonVariants({ variant: "default" })}`} // Default for primary action
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
             <a
               rel="noreferrer noopener"
               href="https://github.com/leoMirandaa/shadcn-landing-page.git"
@@ -136,7 +201,6 @@ export const Navbar = () => {
               <GitHubLogoIcon className="mr-2 w-5 h-5" />
               Github
             </a>
-
             <ModeToggle />
           </div>
         </NavigationMenuList>
