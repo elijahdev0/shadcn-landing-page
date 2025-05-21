@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface User {
   id: string;
@@ -9,26 +9,47 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>; // Password will be ignored for magic link
+  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  // Removed signup function
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+const LOCAL_STORAGE_AUTH_KEY = 'react-auth-state';
 
-  // Mock login function - Magic Link Style (any email logs in)
-  const login = async (email: string, _pass?: string): Promise<{ success: boolean; error?: string }> => { // Password (_pass) is ignored
-    console.log('Attempting magic link login with:', email); // For testing
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    const storedAuth = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY);
+    return storedAuth ? JSON.parse(storedAuth).isAuthenticated : false;
+  });
+  const [user, setUser] = useState<User | null>(() => {
+    const storedAuth = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY);
+    return storedAuth ? JSON.parse(storedAuth).user : null;
+  });
+
+  useEffect(() => {
+    // This effect runs once on mount to try and load persisted state
+    // The useState initializers above already handle the initial load.
+    // This effect could be used for more complex scenarios like token validation.
+    // For now, we ensure that if the state is somehow out of sync, it gets corrected.
+    const storedAuth = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY);
+    if (storedAuth) {
+      const { isAuthenticated: storedIsAuthenticated, user: storedUser } = JSON.parse(storedAuth);
+      if (isAuthenticated !== storedIsAuthenticated) setIsAuthenticated(storedIsAuthenticated);
+      if (JSON.stringify(user) !== JSON.stringify(storedUser)) setUser(storedUser);
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+
+  const login = async (email: string, _pass?: string): Promise<{ success: boolean; error?: string }> => {
+    console.log('Attempting magic link login with:', email);
     return new Promise((resolve) => {
       setTimeout(() => {
-        if (email && email.includes('@')) { // Basic email validation
-          const mockUser: User = { id: Date.now().toString(), email: email, name: email.split('@')[0] }; // Create user from email
+        if (email && email.includes('@')) {
+          const mockUser: User = { id: Date.now().toString(), email: email, name: email.split('@')[0] };
           setUser(mockUser);
           setIsAuthenticated(true);
+          localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify({ isAuthenticated: true, user: mockUser }));
           resolve({ success: true });
         } else {
           resolve({ success: false, error: 'Please enter a valid email address.' });
@@ -37,18 +58,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
-  // Mock logout function
   const logout = async (): Promise<void> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem(LOCAL_STORAGE_AUTH_KEY);
         resolve();
       }, 500);
     });
   };
-
-  // Removed signup function
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>

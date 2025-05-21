@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Added Link and useNavigate
 import { useAuth } from "../contexts/AuthContext"; // Added useAuth
 import {
@@ -49,8 +49,20 @@ const routeList: RouteProps[] = [
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState<boolean>(false); // Added state for scroll tracking
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -68,11 +80,15 @@ export const Navbar = () => {
         // { to: "/signup", label: "Sign Up", isExternal: false }, // Removed Sign Up
       ];
   
-  const allMobileRoutes = [...routeList, ...authRoutes, { href: "https://github.com/leoMirandaa/shadcn-landing-page.git", label: "Github", isExternal: true }];
+  const allMobileRoutes = [...routeList, ...authRoutes]; // Removed GitHub from mobile routes
 
 
   return (
-    <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
+    <header
+      className={`sticky top-0 z-40 w-full bg-white dark:bg-background transition-shadow duration-200 ${
+        scrolled ? "shadow-md border-b-[1px] dark:border-b-slate-700" : "border-b-[1px] border-transparent"
+      }`}
+    >
       <NavigationMenu className="mx-auto">
         <NavigationMenuList className="container h-14 px-4 w-screen flex justify-between ">
           <NavigationMenuItem className="font-bold flex">
@@ -192,15 +208,7 @@ export const Navbar = () => {
                 </Link> */} {/* Removed Sign Up button */}
               </>
             )}
-            <a
-              rel="noreferrer noopener"
-              href="https://github.com/leoMirandaa/shadcn-landing-page.git"
-              target="_blank"
-              className={`border ${buttonVariants({ variant: "secondary" })}`}
-            >
-              <GitHubLogoIcon className="mr-2 w-5 h-5" />
-              Github
-            </a>
+            {/* GitHub link removed */}
             <ModeToggle />
           </div>
         </NavigationMenuList>
