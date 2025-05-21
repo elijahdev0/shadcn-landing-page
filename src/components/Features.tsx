@@ -1,4 +1,3 @@
-import { Badge } from "./ui/badge";
 import {
   Card,
   CardContent,
@@ -6,6 +5,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import image from "../assets/growth.png";
 import image3 from "../assets/reflecting.png";
 import image4 from "../assets/looking-ahead.png";
@@ -18,35 +24,35 @@ interface FeatureProps {
 
 const features: FeatureProps[] = [
   {
-    title: "Responsive Design",
+    title: "All-in-One Event Creation",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi nesciunt est nostrum omnis ab sapiente.",
+      "Create unlimited events with custom details, images, and RSVP questions. No account needed to start, with optional account saving and PIN-protected admin access.",
     image: image4,
   },
   {
-    title: "Intuitive user interface",
+    title: "Effortless Guest Management",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi nesciunt est nostrum omnis ab sapiente.",
+      "Easily upload guests via Excel/CSV or add manually. Track RSVPs in real-time, filter your list, and even manage check-ins for in-person events.",
     image: image3,
   },
   {
-    title: "AI-Powered insights",
+    title: "Direct WhatsApp Integration",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi nesciunt est nostrum omnis ab sapiente.",
+      "Connect WhatsApp via QR scan (5-day free trial). Send bulk invites, use templates, and import contacts directly. No Business API needed!",
     image: image,
   },
-];
-
-const featureList: string[] = [
-  "Dark/Light theme",
-  "Reviews",
-  "Features",
-  "Pricing",
-  "Contact form",
-  "Our team",
-  "Responsive design",
-  "Newsletter",
-  "Minimalist",
+  {
+    title: "Customize Your Event's Look & Feel",
+    description:
+      "Upload digital invite images, choose themes (light/dark/custom), and brand your mobile-optimized RSVP page with custom messages and host names.",
+    image: image4, // Reusing image4
+  },
+  {
+    title: "Powerful Admin Tools & Reporting",
+    description:
+      "Edit events, resend invites, export guest lists, add co-hosts, and receive email summary reports. Duplicate events easily for recurring needs.",
+    image: image3, // Reusing image3
+  },
 ];
 
 export const Features = () => {
@@ -56,44 +62,43 @@ export const Features = () => {
       className="container py-24 sm:py-32 space-y-8"
     >
       <h2 className="text-3xl lg:text-4xl font-bold md:text-center">
-        Many{" "}
+        Explore Our{" "}
         <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
-          Great Features
+          Powerful Features
         </span>
       </h2>
 
-      <div className="flex flex-wrap md:justify-center gap-4">
-        {featureList.map((feature: string) => (
-          <div key={feature}>
-            <Badge
-              variant="secondary"
-              className="text-sm"
-            >
-              {feature}
-            </Badge>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map(({ title, description, image }: FeatureProps) => (
-          <Card key={title}>
-            <CardHeader>
-              <CardTitle>{title}</CardTitle>
-            </CardHeader>
-
-            <CardContent>{description}</CardContent>
-
-            <CardFooter>
-              <img
-                src={image}
-                alt="About feature"
-                className="w-[200px] lg:w-[300px] mx-auto"
-              />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+        className="w-full max-w-4xl mx-auto" // Adjusted width for better carousel display
+      >
+        <CarouselContent>
+          {features.map(({ title, description, image }: FeatureProps, index) => (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+              <div className="p-1">
+                <Card className="h-full flex flex-col"> {/* Ensure cards take full height for alignment */}
+                  <CardHeader>
+                    <CardTitle>{title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">{description}</CardContent> {/* Allow content to grow */}
+                  <CardFooter>
+                    <img
+                      src={image}
+                      alt={title} // More descriptive alt text
+                      className="w-[200px] lg:w-[250px] mx-auto mt-4" // Adjusted image size
+                    />
+                  </CardFooter>
+                </Card>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
     </section>
   );
 };

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { MedalIcon, MapIcon, PlaneIcon, GiftIcon } from "../components/Icons";
+import { FilePlus, Users, Share2, Sparkles } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa"; // Still used in description
 
 interface FeatureProps {
   icon: JSX.Element;
@@ -9,28 +10,28 @@ interface FeatureProps {
 
 const features: FeatureProps[] = [
   {
-    icon: <MedalIcon />,
-    title: "Accessibility",
+    icon: <FilePlus size={48} className="text-primary" />,
+    title: "Create Your Event",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Effortlessly set up your event. Choose a date, time, and location. Customize your event details.",
   },
   {
-    icon: <MapIcon />,
-    title: "Community",
+    icon: <Users size={48} className="text-primary" />,
+    title: "Add Your Guests",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Import guests or add them manually. Manage attendance with ease.",
   },
   {
-    icon: <PlaneIcon />,
-    title: "Scalability",
+    icon: <Share2 size={48} className="text-primary" />,
+    title: "Share Link & Send Invites",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Receive a unique RSVP link instantly. Send WhatsApp invites with a quick QR scan.",
   },
   {
-    icon: <GiftIcon />,
-    title: "Gamification",
+    icon: <Sparkles size={48} className="text-primary" />,
+    title: "Unlimited Access",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Our core RSVP system is 100% free forever. Get a 5 day free trial for Whatsapp invitations.",
   },
 ];
 
@@ -41,15 +42,13 @@ export const HowItWorks = () => {
       className="container text-center py-24 sm:py-32"
     >
       <h2 className="text-3xl md:text-4xl font-bold ">
-        How It{" "}
+        Create & Manage Your Events in{" "}
         <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
-          Works{" "}
+          Minutes
         </span>
-        Step-by-Step Guide
       </h2>
       <p className="md:w-3/4 mx-auto mt-4 mb-8 text-xl text-muted-foreground">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veritatis
-        dolor pariatur sit!
+        Follow these simple steps to create your event, share it with guests, and manage RSVPs effortlessly.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

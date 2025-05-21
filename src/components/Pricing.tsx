@@ -26,48 +26,52 @@ interface PricingProps {
 
 const pricingList: PricingProps[] = [
   {
-    title: "Free",
-    popular: 0,
+    title: "Free Forever",
+    popular: PopularPlanType.NO,
     price: 0,
-    description:
-      "Lorem ipsum dolor sit, amet ipsum consectetur adipisicing elit.",
+    description: "The core RSVP system, always free.",
     buttonText: "Get Started",
     benefitList: [
-      "1 Team member",
-      "2 GB Storage",
-      "Upto 4 pages",
-      "Community support",
-      "lorem ipsum dolor",
+      "Unlimited Events",
+      "Unlimited Guests per Event",
+      "Shareable RSVP Links",
+      "Event Management Dashboard",
+      "Guest List Management (Import/Manual)",
+      "Custom Event Details & Image",
+      "Custom RSVP Questions",
     ],
   },
   {
-    title: "Premium",
-    popular: 1,
-    price: 5,
-    description:
-      "Lorem ipsum dolor sit, amet ipsum consectetur adipisicing elit.",
+    title: "Pro WhatsApp",
+    popular: PopularPlanType.YES,
+    price: 29.99,
+    description: "Everything in Free, plus powerful WhatsApp integration.",
     buttonText: "Start Free Trial",
     benefitList: [
-      "4 Team member",
-      "4 GB Storage",
-      "Upto 6 pages",
-      "Priority support",
-      "lorem ipsum dolor",
+      "All Free Forever features",
+      "Connect 1 WhatsApp Account (QR Scan)",
+      "View WhatsApp Contacts in Dashboard",
+      "Add WhatsApp Contacts to Guest List",
+      "Bulk Send WhatsApp Invites (1-Click)",
+      "Customize Invite Message",
+      "Quick Reply Buttons for RSVP",
+      "Button to RSVP Link in Invite",
+      "Unlimited WhatsApp Messages",
     ],
   },
   {
-    title: "Enterprise",
-    popular: 0,
-    price: 40,
-    description:
-      "Lorem ipsum dolor sit, amet ipsum consectetur adipisicing elit.",
-    buttonText: "Contact US",
+    title: "Planner Suite",
+    popular: PopularPlanType.NO,
+    price: 19.99, // This will be clarified with "/account" text later
+    description: "For event planners managing multiple client accounts.",
+    buttonText: "Contact Us",
     benefitList: [
-      "10 Team member",
-      "8 GB Storage",
-      "Upto 10 pages",
-      "Priority support",
-      "lorem ipsum dolor",
+      "All Pro WhatsApp features",
+      "$19.99/month per WhatsApp Account",
+      "Connect Multiple Client WhatsApp Accounts",
+      "Send Invites from Client's Number",
+      "Assign WhatsApp Accounts per Event",
+      "Use Multiple Accounts for One Event",
     ],
   },
 ];
@@ -79,16 +83,14 @@ export const Pricing = () => {
       className="container py-24 sm:py-32"
     >
       <h2 className="text-3xl md:text-4xl font-bold text-center">
-        Get
+        Simple, Transparent
         <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
           {" "}
-          Unlimited{" "}
+          Pricing{" "}
         </span>
-        Access
       </h2>
       <h3 className="text-xl text-center text-muted-foreground pt-4 pb-8">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Alias
-        reiciendis.
+        Choose the perfect plan for your event needs. Start free or unlock powerful WhatsApp features.
       </h3>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {pricingList.map((pricing: PricingProps) => (
@@ -114,7 +116,7 @@ export const Pricing = () => {
               </CardTitle>
               <div>
                 <span className="text-3xl font-bold">${pricing.price}</span>
-                <span className="text-muted-foreground"> /month</span>
+                <span className="text-muted-foreground">{pricing.title === "Planner Suite" ? " /account/month" : " /month"}</span>
               </div>
 
               <CardDescription>{pricing.description}</CardDescription>

@@ -13,34 +13,42 @@ interface FAQProps {
 
 const FAQList: FAQProps[] = [
   {
-    question: "Is this template free?",
-    answer: "Yes. It is a free ChadcnUI template.",
+    question: "Do my guests need an account to RSVP?",
+    answer:
+      "No, not at all! Guests can RSVP directly via the unique link you share. No sign-ups or logins are required for them, making it super easy for everyone.",
     value: "item-1",
   },
   {
-    question: "Lorem ipsum dolor sit amet consectetur adipisicing elit?",
+    question: "Is the core RSVP system really free forever?",
     answer:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint labore quidem quam? Consectetur sapiente iste rerum reiciendis animi nihil nostrum sit quo, modi quod.",
+      "Yes! Our core RSVP system, which includes unlimited events, unlimited guests, shareable links, and guest list management, is 100% free, forever.",
     value: "item-2",
   },
   {
-    question:
-      "Lorem ipsum dolor sit amet  Consectetur natus dolores minus quibusdam?",
+    question: "How does the WhatsApp integration work?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore qui nostrum reiciendis veritatis necessitatibus maxime quis ipsa vitae cumque quo?",
+      "It's simple! You connect your own WhatsApp account (personal or business) by scanning a QR code. Then, you can import contacts, customize messages, and send bulk invites directly from your number. No complex API setup is needed.",
     value: "item-3",
   },
   {
-    question: "Lorem ipsum dolor sit amet, consectetur adipisicing elit?",
-    answer: "Lorem ipsum dolor sit amet consectetur, adipisicing elit.",
+    question: "Can I customize the RSVP questions for my event?",
+    answer:
+      "Absolutely! You can add custom questions to your RSVP form to gather specific information like meal preferences, +1s, or any other details you need for your event.",
     value: "item-4",
   },
   {
     question:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur natus?",
+      "What if I need to manage events for multiple clients using WhatsApp?",
     answer:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint labore quidem quam? Consectetur sapiente iste rerum reiciendis animi nihil nostrum sit quo, modi quod.",
+      "Our 'Planner Suite' is designed for you! It allows you to connect multiple WhatsApp accounts (e.g., your clients' accounts) at $19.99/month per connected account, so you can send invites directly from their numbers. Please contact us for more details on this plan.",
     value: "item-5",
+  },
+  {
+    question:
+      "Is there a limit to the number of WhatsApp messages I can send with the paid plans?",
+    answer:
+      "With our 'Pro WhatsApp' and 'Planner Suite' plans, you get unlimited WhatsApp messages. The 'Free Forever' plan does not include direct WhatsApp sending through our system, but you can always share your RSVP link via WhatsApp manually.",
+    value: "item-6",
   },
 ];
 
