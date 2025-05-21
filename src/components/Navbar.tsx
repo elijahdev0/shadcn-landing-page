@@ -97,7 +97,7 @@ export const Navbar = () => {
               className="ml-2 font-bold text-xl flex items-center" // Added items-center
             >
               <LogoIcon />
-              <span className="ml-2">ShadcnUI/React</span> {/* Added span and ml-2 for spacing */}
+              <span className="ml-2">Eazy Invites</span> {/* Added span and ml-2 for spacing */}
             </Link>
           </NavigationMenuItem>
 
