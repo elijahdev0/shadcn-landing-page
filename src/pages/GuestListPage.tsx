@@ -208,10 +208,10 @@ export function GuestListPage() {
           />
         </div>
 
-        <EventGuestListsManager
+        {/* <EventGuestListsManager
           user={user as UserProfile | null}
           mainContacts={contacts}
-        />
+        /> */}
 
         <Card className="mt-8"> {/* Added margin-top for spacing */}
           <CardHeader className="flex flex-row items-center justify-between">

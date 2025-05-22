@@ -16,12 +16,12 @@ import "./App.css"; // Main app styles
 
 // Layout component to include Navbar, Footer, ScrollToTop
 const MainLayout = () => (
-  <>
+  <div className="overflow-x-hidden">
     <Navbar />
     <Outlet /> {/* Child routes will render here */}
     <Footer />
     <ScrollToTop />
-  </>
+  </div>
 );
 
 function App() {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/contexts/AuthContext';
+import { supabase, useAuth } from '@/contexts/AuthContext'; // Modified
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Copy } from 'lucide-react';
-import { AppHeader } from '@/components/AppHeader'; // Import the AppHeader
+import { AppHeader } from '@/components/AppHeader';
+import { type Contact } from '@/components/guestlist/ContactsTable'; // Added
+import { ManageContactsDialog } from '@/components/guestlist/ManageContactsDialog'; // Added
 
 interface Event {
   id: string;
@@ -40,6 +42,8 @@ interface RsvpEntry {
 export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth(); // Added
+
   const [event, setEvent] = useState<Event | null>(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [eventError, setEventError] = useState<string | null>(null);
@@ -48,21 +52,33 @@ export function EventDetailPage() {
   const [loadingRsvps, setLoadingRsvps] = useState(true);
   const [rsvpsError, setRsvpsError] = useState<string | null>(null);
 
+  // New state for main contacts
+  const [mainContacts, setMainContacts] = useState<Contact[]>([]);
+  const [loadingMainContacts, setLoadingMainContacts] = useState(true);
+  const [mainContactsError, setMainContactsError] = useState<string | null>(null);
+
+  // New state for dialog
+  const [isManageGuestListDialogOpen, setIsManageGuestListDialogOpen] = useState(false);
+
   useEffect(() => {
     if (!eventId) {
       setEventError('Event ID is missing.');
       setLoadingEvent(false);
       setLoadingRsvps(false);
+      setLoadingMainContacts(false); // Also set main contacts loading to false
       return;
     }
 
     const fetchAllDetails = async () => {
       setLoadingEvent(true);
       setLoadingRsvps(true);
+      // setLoadingMainContacts(true); // This will be handled by fetchMainContactsForUser
       setEventError(null);
       setRsvpsError(null);
+      // setMainContactsError(null); // This will be handled by fetchMainContactsForUser
 
       try {
+        // Fetch Event Details (existing logic)
         const { data: eventData, error: fetchEventError } = await supabase
           .from('events')
           .select('*')
@@ -74,16 +90,13 @@ export function EventDetailPage() {
           setEventError('Event not found.');
           setLoadingEvent(false);
           setLoadingRsvps(false);
-          return;
-          setEventError('Event not found.');
-          setLoadingEvent(false);
-          setLoadingRsvps(false);
+          // setLoadingMainContacts(false); // Ensure all loading states are handled
           return;
         }
         setEvent(eventData as Event);
-        setLoadingEvent(false);
+        // setLoadingEvent(false); // Moved to finally block
 
-        // Fetch RSVPs
+        // Fetch RSVPs (existing logic)
         const { data: rsvpsData, error: fetchRsvpsError } = await supabase
           .from('rsvps')
           .select('*')
@@ -92,20 +105,48 @@ export function EventDetailPage() {
 
         if (fetchRsvpsError) throw fetchRsvpsError;
         setRsvpsList(rsvpsData || []);
+        // setLoadingRsvps(false); // Moved to finally block
 
       } catch (err: any) {
-        console.error('Error fetching details for event page:', err);
-        // Differentiate errors or set a general one
+        console.error('Error fetching event details or RSVPs:', err);
         if (!event) setEventError(err.message || 'Failed to fetch event details.');
-        setRsvpsError(err.message || 'Failed to fetch RSVPs.');
+        else setRsvpsError(err.message || 'Failed to fetch RSVPs.'); // if event loaded, error is likely rsvps
       } finally {
-        setLoadingEvent(false); // Ensure loading states are false
+        setLoadingEvent(false);
         setLoadingRsvps(false);
       }
     };
 
+    const fetchMainContactsForUser = async () => {
+      if (!user) {
+        setMainContacts([]);
+        setLoadingMainContacts(false);
+        // Optionally set an error or info message if user is expected but not present
+        // setMainContactsError("User not available to fetch contacts.");
+        return;
+      }
+      setLoadingMainContacts(true);
+      setMainContactsError(null);
+      try {
+        const { data, error } = await supabase
+          .from('contacts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('name', { ascending: true });
+        if (error) throw error;
+        setMainContacts(data || []);
+      } catch (err: any) {
+        console.error("Error fetching main contacts:", err);
+        setMainContactsError(err.message || "Failed to fetch contacts.");
+      } finally {
+        setLoadingMainContacts(false);
+      }
+    };
+
     fetchAllDetails();
-  }, [eventId]);
+    fetchMainContactsForUser(); // Call the new function
+
+  }, [eventId, user]); // Add user to dependency array
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
@@ -277,15 +318,29 @@ export function EventDetailPage() {
           </CardFooter>
         </Card>
 
-        {/* RSVP List Card */}
+        {/* RSVP List Card - Modified Header */}
         <Card className="w-full max-w-3xl">
           <CardHeader>
-            <CardTitle>Guest List / RSVPs</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>Guest List / RSVPs</CardTitle>
+              {event && user && ( // Only show button if event and user are loaded
+                <Button
+                  onClick={() => setIsManageGuestListDialogOpen(true)}
+                  disabled={loadingMainContacts || !!mainContactsError}
+                  size="sm"
+                >
+                  Manage Guest List
+                </Button>
+              )}
+            </div>
             <CardDescription>
               {rsvpsList.length > 0
                 ? `${rsvpsList.length} guest(s) have responded.`
                 : "No RSVPs received yet."}
             </CardDescription>
+            {mainContactsError && (
+              <p className="text-sm text-red-600 mt-2">Error loading contacts: {mainContactsError}</p>
+            )}
           </CardHeader>
           <CardContent>
             {loadingRsvps && (
@@ -333,6 +388,26 @@ export function EventDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Conditionally render the ManageContactsDialog */}
+        {event && user && (
+          <ManageContactsDialog
+            user={user}
+            isOpen={isManageGuestListDialogOpen}
+            onOpenChange={setIsManageGuestListDialogOpen}
+            selectedEventId={event.id}
+            selectedEventName={event.name}
+            mainContacts={mainContacts}
+            onContactsUpdated={(updatedEventId) => {
+              console.log(`Guest list updated for event: ${updatedEventId}. Consider refreshing RSVP/guest summary.`);
+              // Future enhancement: Trigger a refetch of RSVP data or a guest count summary
+              // if displayed directly on EventDetailPage.tsx.
+            }}
+            clearManagingState={() => {
+              // Optional: Any specific cleanup needed in EventDetailPage when dialog closes.
+            }}
+          />
+        )}
       </main>
     </div>
   );
