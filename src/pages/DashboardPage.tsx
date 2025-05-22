@@ -75,7 +75,7 @@ import { useAuth } from "../contexts/AuthContext" // To get user info and logout
           </Link>
           <Link
             to="/guest-lists" // Added Guest Lists
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
           >
             Guest Lists
           </Link>
