@@ -38,23 +38,68 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Link } from "react-router-dom" // Using Link from react-router-dom
-import { useAuth } from "../contexts/AuthContext" // To get user info and logout
-// import { useNavigate } from 'react-router-dom'; // Already imported at the bottom, ensure only one import
- 
- // Unused example data removed
- // const recentSales = [ ... ];
- // const recentTransactions = [ ... ];
- 
- export function DashboardPage() {
+import { Link, useNavigate } from "react-router-dom"; // Using Link from react-router-dom
+import { useAuth } from "../contexts/AuthContext"; // To get user info and logout
+import { supabase } from "../contexts/AuthContext"; // Import Supabase client
+import React, { useState, useEffect } from 'react'; // Added useState and useEffect
+
+// Unused example data removed
+// const recentSales = [ ... ];
+// const recentTransactions = [ ... ];
+
+interface Event {
+  id: string;
+  created_at: string;
+  user_id: string;
+  name: string;
+  description?: string | null;
+  event_date?: string | null;
+  location?: string | null;
+  is_public: boolean;
+}
+
+export function DashboardPage() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate(); // from react-router-dom, if needed for programmatic navigation
+  const navigate = useNavigate();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!user) {
+        setLoadingEvents(false);
+        setEvents([]); // Clear events if user logs out
+        return;
+      }
+
+      setLoadingEvents(true);
+      setEventsError(null);
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('event_date', { ascending: true });
+
+        if (error) throw error;
+        setEvents(data || []);
+      } catch (err: any) {
+        console.error("Error fetching events:", err);
+        setEventsError(err.message || "Failed to fetch events.");
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
+    fetchEvents();
+  }, [user]); // Refetch if user changes
+
 
   const handleLogout = async () => {
     await logout();
     // navigate('/login'); // Or let ProtectedRoute handle redirect
   };
-
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -166,15 +211,39 @@ import { useAuth } from "../contexts/AuthContext" // To get user info and logout
               </CardContent>
             </Card>
           */}
-          <div className="border-dashed border-2 border-gray-300 p-8 rounded-lg text-center">
-            <p className="text-muted-foreground">Your events will appear here.</p>
-            <p className="text-sm text-muted-foreground">Click "Create New Event" to get started.</p>
-          </div>
+          {loadingEvents && <p>Loading your events...</p>}
+          {eventsError && <p className="text-red-600">Error: {eventsError}</p>}
+          {!loadingEvents && !eventsError && events.length === 0 && (
+            <div className="border-dashed border-2 border-gray-300 p-8 rounded-lg text-center">
+              <p className="text-muted-foreground">You haven't created any events yet.</p>
+              <p className="text-sm text-muted-foreground">Click "Create New Event" to get started.</p>
+            </div>
+          )}
+          {!loadingEvents && !eventsError && events.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {events.map((event) => (
+                <Card key={event.id} onClick={() => navigate(`/events/${event.id}`)} className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{event.name}</CardTitle>
+                    <CardDescription>
+                      {event.event_date ? new Date(event.event_date).toLocaleDateString() : 'Date TBD'}
+                      {event.location && ` - ${event.location}`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground truncate">{event.description || 'No description available.'}</p>
+                    <Badge variant={event.is_public ? "default" : "secondary"} className="mt-2">
+                      {event.is_public ? 'Public' : 'Private'}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
-  )
+  );
 }
 
-// Need to add useNavigate import if not already present at the top
-import { useNavigate } from 'react-router-dom';
+// useNavigate is already imported at the top after changes

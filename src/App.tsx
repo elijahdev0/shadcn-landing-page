@@ -5,7 +5,9 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 // import { SignupPage } from './pages/SignupPage'; // Removed SignupPage import
+import { CreateEventPage } from './pages/CreateEventPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { EventDetailPage } from './pages/EventDetailPage'; // Import EventDetailPage
 import { NotFoundPage } from './pages/NotFoundPage'; // Import NotFoundPage
 import { ProtectedRoute } from './components/ProtectedRoute';
 import "./App.css"; // Main app styles
@@ -39,6 +41,16 @@ function App() {
           {/* Or, if DashboardPage includes its own header/sidebar, it can be directly routed */}
            <Route index element={<DashboardPage />} /> {/* if DashboardPage is the only child */}
           {/* <Route path="" element={<DashboardPage />} /> Alternative if more nested dashboard routes */}
+        </Route>
+
+        {/* Protected Create Event Route */}
+        <Route path="/create-event" element={<ProtectedRoute />}>
+          <Route index element={<CreateEventPage />} />
+        </Route>
+
+        {/* Protected Event Detail Page Route */}
+        <Route path="/events/:eventId" element={<ProtectedRoute />}>
+          <Route index element={<EventDetailPage />} />
         </Route>
         
         {/* Catch-all 404 Route */}
