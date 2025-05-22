@@ -128,7 +128,7 @@ export function EventDetailPage() {
         toast.error("Event ID not found. Cannot copy link.");
         return;
       }
-      const rsvpLink = `${window.location.origin}/rsvp/${eventId}`;
+      const rsvpLink = `${import.meta.env.VITE_APP_URL}/rsvp/${eventId}`;
       await navigator.clipboard.writeText(rsvpLink);
       toast.success("RSVP link copied to clipboard!");
     } catch (err) {
