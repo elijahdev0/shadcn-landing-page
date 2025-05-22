@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom"; // Using Link from react-router-dom
 import { useAuth } from "../contexts/AuthContext"; // To get user info and logout
 import { supabase } from "../contexts/AuthContext"; // Import Supabase client
-import React, { useState, useEffect } from 'react'; // Added useState and useEffect
+import { useState, useEffect } from 'react'; // Added useState and useEffect
 import { AppHeader } from "@/components/AppHeader"; // Import the new AppHeader component
 
 // Unused example data removed

@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Smartphone,
-  MessageCircle,
   // Users, // No longer needed directly here, FaWhatsapp will be used
   CalendarDays,
   MapPin,

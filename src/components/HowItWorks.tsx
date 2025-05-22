@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { FilePlus, Users, Share2, Sparkles } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa"; // Still used in description
 
 interface FeatureProps {
   icon: JSX.Element;
