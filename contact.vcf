@@ -1,0 +1,19 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:John Doe
+N:Doe;John;;;
+EMAIL;TYPE=INTERNET,PREF:john.doe@example.com
+TEL;TYPE=CELL:(123) 456-7890
+TEL;TYPE=HOME:(098) 765-4321
+ORG:Doe Corp.
+TITLE:Chief Example Officer
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:Jane Smith
+N:Smith;Jane;;;
+EMAIL;TYPE=INTERNET:jane.smith@example.net
+TEL;TYPE=WORK,VOICE:555-123-4567
+NOTE:Met at conference.
+END:VCARD

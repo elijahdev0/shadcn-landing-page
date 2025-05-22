@@ -9,6 +9,7 @@ import { CreateEventPage } from './pages/CreateEventPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EventDetailPage } from './pages/EventDetailPage'; // Import EventDetailPage
 import { RsvpPage } from './pages/RsvpPage'; // Import RsvpPage
+import { GuestListPage } from './pages/GuestListPage'; // Import GuestListPage
 import { NotFoundPage } from './pages/NotFoundPage'; // Import NotFoundPage
 import { ProtectedRoute } from './components/ProtectedRoute';
 import "./App.css"; // Main app styles
@@ -55,6 +56,11 @@ function App() {
         {/* Protected Event Detail Page Route */}
         <Route path="/events/:eventId" element={<ProtectedRoute />}>
           <Route index element={<EventDetailPage />} />
+        </Route>
+
+        {/* Protected Guest List Page Route */}
+        <Route path="/guest-lists" element={<ProtectedRoute />}>
+          <Route index element={<GuestListPage />} />
         </Route>
         
         {/* Catch-all 404 Route */}
