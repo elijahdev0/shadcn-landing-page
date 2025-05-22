@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   email?: string;
   name?: string;

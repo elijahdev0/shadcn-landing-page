@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'; // Removed FormEvent
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-// Input, Label, RadioGroup, RadioGroupItem removed as RSVP form is gone
 import {
   Table,
   TableBody,
@@ -16,8 +15,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Copy } from 'lucide-react';
+import { AppHeader } from '@/components/AppHeader'; // Import the AppHeader
 
-// Define a type for the event data based on your table schema
 interface Event {
   id: string;
   created_at: string;
@@ -28,8 +27,6 @@ interface Event {
   location: string | null;
   is_public: boolean;
 }
-
-// type RsvpStatus removed as RSVP form is gone
 
 interface RsvpEntry {
   id: string;
@@ -44,8 +41,8 @@ export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
-  const [loadingEvent, setLoadingEvent] = useState(true); // Renamed for clarity
-  const [eventError, setEventError] = useState<string | null>(null); // Renamed for clarity
+  const [loadingEvent, setLoadingEvent] = useState(true);
+  const [eventError, setEventError] = useState<string | null>(null);
 
   const [rsvpsList, setRsvpsList] = useState<RsvpEntry[]>([]);
   const [loadingRsvps, setLoadingRsvps] = useState(true);
@@ -66,7 +63,6 @@ export function EventDetailPage() {
       setRsvpsError(null);
 
       try {
-        // Fetch Event Details
         const { data: eventData, error: fetchEventError } = await supabase
           .from('events')
           .select('*')
@@ -75,6 +71,10 @@ export function EventDetailPage() {
 
         if (fetchEventError) throw fetchEventError;
         if (!eventData) {
+          setEventError('Event not found.');
+          setLoadingEvent(false);
+          setLoadingRsvps(false);
+          return;
           setEventError('Event not found.');
           setLoadingEvent(false);
           setLoadingRsvps(false);
@@ -141,62 +141,71 @@ export function EventDetailPage() {
 
   if (loadingEvent) { // Check loadingEvent specifically for the main card
     return (
-      <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8 space-y-8">
-        {/* Skeleton for Event Details Card */}
-        <Card className="w-full max-w-3xl">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardContent>
-          <CardFooter>
-            <Skeleton className="h-10 w-24" />
-          </CardFooter>
-        </Card>
-        {/* Skeleton for RSVP List Card */}
-        <Card className="w-full max-w-3xl">
-          <CardHeader>
-            <Skeleton className="h-7 w-1/3 mb-2" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-full mb-2" />
-            <Skeleton className="h-8 w-full mb-2" />
-            <Skeleton className="h-8 w-full" />
-          </CardContent>
-        </Card>
+      <div className="flex flex-col min-h-screen bg-background">
+        <AppHeader />
+        <main className="flex flex-1 flex-col items-center p-4 md:p-8 space-y-8">
+          {/* Skeleton for Event Details Card */}
+          <Card className="w-full max-w-3xl">
+            <CardHeader>
+              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardContent>
+            <CardFooter>
+              <Skeleton className="h-10 w-24" />
+            </CardFooter>
+          </Card>
+          {/* Skeleton for RSVP List Card */}
+          <Card className="w-full max-w-3xl">
+            <CardHeader>
+              <Skeleton className="h-7 w-1/3 mb-2" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-full mb-2" />
+              <Skeleton className="h-8 w-full mb-2" />
+              <Skeleton className="h-8 w-full" />
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
 
   if (eventError) { // Prioritize event error
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-background p-4 md:p-8 text-red-600">
-        <Card className="w-full max-w-md p-6">
-          <CardHeader><CardTitle>Error Loading Event</CardTitle></CardHeader>
-          <CardContent>
-            <p>{eventError}</p>
-            <Button onClick={() => navigate(-1)} className="mt-4">Go Back</Button>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col min-h-screen bg-background">
+        <AppHeader />
+        <main className="flex flex-1 flex-col justify-center items-center p-4 md:p-8 text-red-600">
+          <Card className="w-full max-w-md p-6">
+            <CardHeader><CardTitle>Error Loading Event</CardTitle></CardHeader>
+            <CardContent>
+              <p>{eventError}</p>
+              <Button onClick={() => navigate(-1)} className="mt-4">Go Back</Button>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
 
   if (!event) { // Should be caught by eventError if fetch failed
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-background p-4 md:p-8">
-        <Card className="w-full max-w-md p-6">
-          <CardHeader><CardTitle>Event Not Found</CardTitle></CardHeader>
-          <CardContent>
-            <p>The requested event could not be found.</p>
-            <Button onClick={() => navigate(-1)} className="mt-4">Go Back</Button>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col min-h-screen bg-background">
+        <AppHeader />
+        <main className="flex flex-1 flex-col justify-center items-center p-4 md:p-8">
+          <Card className="w-full max-w-md p-6">
+            <CardHeader><CardTitle>Event Not Found</CardTitle></CardHeader>
+            <CardContent>
+              <p>The requested event could not be found.</p>
+              <Button onClick={() => navigate(-1)} className="mt-4">Go Back</Button>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
@@ -215,113 +224,116 @@ export function EventDetailPage() {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8 space-y-8">
-      {/* Event Details Card */}
-      <Card className="w-full max-w-3xl">
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-2xl font-bold">{event.name}</CardTitle>
-              <CardDescription>Event ID: {event.id}</CardDescription>
+    <div className="flex flex-col min-h-screen bg-background">
+      <AppHeader />
+      <main className="flex flex-1 flex-col items-center p-4 md:p-8 space-y-8">
+        {/* Event Details Card */}
+        <Card className="w-full max-w-3xl">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl font-bold">{event.name}</CardTitle>
+                <CardDescription>Event ID: {event.id}</CardDescription>
+              </div>
+              <Button variant="outline" size="icon" onClick={handleCopyLink} title="Copy RSVP link">
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
-            <Button variant="outline" size="icon" onClick={handleCopyLink} title="Copy RSVP link">
-              <Copy className="h-4 w-4" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {event.description && (
+              <div>
+                <h3 className="font-semibold text-lg">Description</h3>
+                <p className="text-muted-foreground">{event.description}</p>
+              </div>
+            )}
+            <div>
+              <h3 className="font-semibold text-lg">Date & Time</h3>
+              <p className="text-muted-foreground">{formatDate(event.event_date)}</p>
+            </div>
+            {event.location && (
+              <div>
+                <h3 className="font-semibold text-lg">Location</h3>
+                <p className="text-muted-foreground">{event.location}</p>
+              </div>
+            )}
+            <div>
+              <h3 className="font-semibold text-lg">Visibility</h3>
+              <p className="text-muted-foreground">{event.is_public ? 'Public' : 'Private'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Created By (User ID)</h3>
+              <p className="text-muted-foreground">{event.user_id}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Created On</h3>
+              <p className="text-muted-foreground">{formatDate(event.created_at)}</p>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => navigate(-1)} variant="outline">
+              Back
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {event.description && (
-            <div>
-              <h3 className="font-semibold text-lg">Description</h3>
-              <p className="text-muted-foreground">{event.description}</p>
-            </div>
-          )}
-          <div>
-            <h3 className="font-semibold text-lg">Date & Time</h3>
-            <p className="text-muted-foreground">{formatDate(event.event_date)}</p>
-          </div>
-          {event.location && (
-            <div>
-              <h3 className="font-semibold text-lg">Location</h3>
-              <p className="text-muted-foreground">{event.location}</p>
-            </div>
-          )}
-          <div>
-            <h3 className="font-semibold text-lg">Visibility</h3>
-            <p className="text-muted-foreground">{event.is_public ? 'Public' : 'Private'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">Created By (User ID)</h3>
-            <p className="text-muted-foreground">{event.user_id}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">Created On</h3>
-            <p className="text-muted-foreground">{formatDate(event.created_at)}</p>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={() => navigate(-1)} variant="outline">
-            Back
-          </Button>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
 
-      {/* RSVP List Card */}
-      <Card className="w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle>Guest List / RSVPs</CardTitle>
-          <CardDescription>
-            {rsvpsList.length > 0
-              ? `${rsvpsList.length} guest(s) have responded.`
-              : "No RSVPs received yet."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loadingRsvps && (
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
-            </div>
-          )}
-          {!loadingRsvps && rsvpsError && (
-            <p className="text-red-600">Error loading RSVPs: {rsvpsError}</p>
-          )}
-          {!loadingRsvps && !rsvpsError && rsvpsList.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Submitted</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rsvpsList.map((rsvp) => (
-                  <TableRow key={rsvp.id}>
-                    <TableCell className="font-medium">{rsvp.name}</TableCell>
-                    <TableCell>{rsvp.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={rsvp.status === 'attending' ? 'default' : 'outline'}>
-                        {rsvp.status === 'attending' ? 'Attending' : 'Not Attending'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatDate(rsvp.submitted_at)} at {formatRsvpTime(rsvp.submitted_at)}
-                    </TableCell>
+        {/* RSVP List Card */}
+        <Card className="w-full max-w-3xl">
+          <CardHeader>
+            <CardTitle>Guest List / RSVPs</CardTitle>
+            <CardDescription>
+              {rsvpsList.length > 0
+                ? `${rsvpsList.length} guest(s) have responded.`
+                : "No RSVPs received yet."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingRsvps && (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            )}
+            {!loadingRsvps && rsvpsError && (
+              <p className="text-red-600">Error loading RSVPs: {rsvpsError}</p>
+            )}
+            {!loadingRsvps && !rsvpsError && rsvpsList.length > 0 && (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Submitted</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          {!loadingRsvps && !rsvpsError && rsvpsList.length === 0 && (
-            <p className="text-muted-foreground text-center py-4">
-              No one has RSVP'd yet. Share the link to get responses!
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {rsvpsList.map((rsvp) => (
+                    <TableRow key={rsvp.id}>
+                      <TableCell className="font-medium">{rsvp.name}</TableCell>
+                      <TableCell>{rsvp.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={rsvp.status === 'attending' ? 'default' : 'outline'}>
+                          {rsvp.status === 'attending' ? 'Attending' : 'Not Attending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatDate(rsvp.submitted_at)} at {formatRsvpTime(rsvp.submitted_at)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            {!loadingRsvps && !rsvpsError && rsvpsList.length === 0 && (
+              <p className="text-muted-foreground text-center py-4">
+                No one has RSVP'd yet. Share the link to get responses!
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }

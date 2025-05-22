@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Switch } from '@/components/ui/switch'; // For is_public
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/contexts/AuthContext'; // Assuming supabase client is exported from AuthContext
+import { AppHeader } from '@/components/AppHeader';
 
 export function CreateEventPage() {
   const { user } = useAuth();
@@ -71,75 +72,78 @@ export function CreateEventPage() {
   };
 
   return (
-    <div className="flex justify-center items-start min-h-screen bg-background p-4 md:p-8">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Create New Event</CardTitle>
-          <CardDescription>Fill in the details below to create your event.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label htmlFor="eventName">Event Name</Label>
-              <Input
-                id="eventName"
-                type="text"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-                placeholder="e.g., Summer Music Festival"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell us more about your event..."
-                rows={4}
-              />
-            </div>
-            <div>
-              <Label htmlFor="eventDate">Event Date & Time</Label>
-              <Input
-                id="eventDate"
-                type="datetime-local" // HTML5 datetime input
-                value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., Central Park or Online"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isPublic"
-                checked={isPublic}
-                onCheckedChange={setIsPublic}
-              />
-              <Label htmlFor="isPublic">Make event public?</Label>
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <div className="flex justify-end space-x-3">
-                <Button type="button" variant="outline" onClick={() => navigate(-1)} disabled={isLoading}>
-                    Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Creating...' : 'Create Event'}
-                </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col min-h-screen bg-background">
+      <AppHeader />
+      <main className="flex flex-1 justify-center items-start p-4 md:p-8">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle>Create New Event</CardTitle>
+            <CardDescription>Fill in the details below to create your event.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="eventName">Event Name</Label>
+                <Input
+                  id="eventName"
+                  type="text"
+                  value={eventName}
+                  onChange={(e) => setEventName(e.target.value)}
+                  placeholder="e.g., Summer Music Festival"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Tell us more about your event..."
+                  rows={4}
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventDate">Event Date & Time</Label>
+                <Input
+                  id="eventDate"
+                  type="datetime-local" // HTML5 datetime input
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g., Central Park or Online"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isPublic"
+                  checked={isPublic}
+                  onCheckedChange={setIsPublic}
+                />
+                <Label htmlFor="isPublic">Make event public?</Label>
+              </div>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <div className="flex justify-end space-x-3">
+                  <Button type="button" variant="outline" onClick={() => navigate(-1)} disabled={isLoading}>
+                      Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                      {isLoading ? 'Creating...' : 'Create Event'}
+                  </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
