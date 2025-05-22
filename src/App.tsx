@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { CreateEventPage } from './pages/CreateEventPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EventDetailPage } from './pages/EventDetailPage'; // Import EventDetailPage
+import { RsvpPage } from './pages/RsvpPage'; // Import RsvpPage
 import { NotFoundPage } from './pages/NotFoundPage'; // Import NotFoundPage
 import { ProtectedRoute } from './components/ProtectedRoute';
 import "./App.css"; // Main app styles
@@ -34,6 +35,9 @@ function App() {
         {/* Routes without the main layout (e.g., login, dashboard might have their own full-page layouts) */}
         <Route path="/login" element={<LoginPage />} />
         {/* <Route path="/signup" element={<SignupPage />} /> Removed SignupPage route */}
+
+        {/* Public RSVP Page Route */}
+        <Route path="/rsvp/:eventId" element={<RsvpPage />} />
         
         {/* Protected Dashboard Route */}
         <Route path="/dashboard" element={<ProtectedRoute />}>

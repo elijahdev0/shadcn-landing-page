@@ -39,21 +39,29 @@ export function CreateEventPage() {
     setError(null);
 
     try {
-      const { error: insertError } = await supabase.from('events').insert({
-        user_id: user.id,
-        name: eventName,
-        description,
-        event_date: new Date(eventDate).toISOString(), // Ensure correct date format
-        location,
-        is_public: isPublic,
-      });
+      const { data: newEvent, error: insertError } = await supabase
+        .from('events')
+        .insert({
+          user_id: user.id,
+          name: eventName,
+          description,
+          event_date: new Date(eventDate).toISOString(), // Ensure correct date format
+          location,
+          is_public: isPublic,
+        })
+        .select()
+        .single();
 
       if (insertError) {
         throw insertError;
       }
 
-      // Optionally, navigate to the dashboard or the new event's page
-      navigate('/dashboard'); // Or show a success message
+      if (newEvent) {
+        navigate(`/events/${newEvent.id}`); // Navigate to the new event's detail page
+      } else {
+        // Fallback if newEvent data isn't returned, though it should be with .single()
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       console.error('Error creating event:', err);
       setError(err.message || 'Failed to create event. Please try again.');
